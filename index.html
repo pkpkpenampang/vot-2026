@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kewangan Jabatan - PKPK Penampang</title>
+    <title>Dashboard Kewangan Real-Time - PKPK Penampang</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
@@ -22,7 +22,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span id="lastUpdated" class="inline-flex items-center rounded-md bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
-                    Memuatkan...
+                    Memuatkan Data...
                 </span>
                 <button onclick="fetchAllData()" class="bg-indigo-600 hover:bg-indigo-500 text-xs text-white px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1 shadow">
                     🔄 Kemaskini Live
@@ -43,7 +43,7 @@
         <!-- Program Subheader Badge -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
-                <span id="programCode" class="text-xs font-bold font-mono px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md">SEMUA PROGRAM (7 TAB)</span>
+                <span id="programCode" class="text-xs font-bold font-mono px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md">SEMUA PROGRAM</span>
                 <h2 id="programTitle" class="text-lg font-bold text-slate-900 mt-1">Gambaran Keseluruhan Peruntukan & Perbelanjaan</h2>
             </div>
             <div id="programSubtext" class="text-xs text-slate-500">
@@ -127,15 +127,14 @@
     </main>
 
     <script>
-        // List of all 7 published Google Sheets CSV links
         const PROGRAM_SOURCES = [
-            { id: "1", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=2082925730&single=true&output=csv" },
-            { id: "2", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=347453524&single=true&output=csv" },
-            { id: "3", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1183991511&single=true&output=csv" },
-            { id: "4", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=919148410&single=true&output=csv" },
-            { id: "5", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1533984767&single=true&output=csv" },
-            { id: "6", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=936928104&single=true&output=csv" },
-            { id: "7", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=219580261&single=true&output=csv" }
+            { label: "010100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=2082925730&single=true&output=csv" },
+            { label: "040100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=347453524&single=true&output=csv" },
+            { label: "Tab 3", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1183991511&single=true&output=csv" },
+            { label: "Tab 4", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=919148410&single=true&output=csv" },
+            { label: "Tab 5", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1533984767&single=true&output=csv" },
+            { label: "Tab 6", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=936928104&single=true&output=csv" },
+            { label: "Tab 7", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=219580261&single=true&output=csv" }
         ];
 
         let allTransactions = [];
@@ -146,35 +145,35 @@
 
         function parseCurrency(str) {
             if (!str) return 0.0;
-            const cleaned = str.toString().replace(/[^0-9.-]+/g, "");
-            const val = parseFloat(cleaned);
+            let cleaned = str.toString().replace(/[^0-9.-]+/g, "");
+            let val = parseFloat(cleaned);
             return isNaN(val) ? 0.0 : val;
         }
 
         function fetchAllData() {
-            document.getElementById('lastUpdated').innerText = 'Memuatkan 7 Tab...';
+            document.getElementById('lastUpdated').innerText = 'Memuatkan Data...';
             allTransactions = [];
             detectedPrograms = [];
 
-            let fetchPromises = PROGRAM_SOURCES.map((src) => {
+            let promises = PROGRAM_SOURCES.map((src, index) => {
                 return new Promise((resolve) => {
                     Papa.parse(src.url, {
                         download: true,
                         header: false,
                         skipEmptyLines: true,
                         complete: function(results) {
-                            parseSheetRows(results.data);
+                            parseSheetRows(results.data, src.label, index + 1);
                             resolve();
                         },
                         error: function(err) {
-                            console.error("Ralat memuat tab:", src.url, err);
+                            console.error("Ralat memuat:", src.url, err);
                             resolve();
                         }
                     });
                 });
             });
 
-            Promise.all(fetchPromises).then(() => {
+            Promise.all(promises).then(() => {
                 const now = new Date();
                 document.getElementById('lastUpdated').innerText = `Live: ${now.toLocaleTimeString('ms-MY')}`;
                 renderDynamicTabs();
@@ -182,46 +181,75 @@
             });
         }
 
-        function parseSheetRows(rows) {
-            let currentProgCode = "Program";
+        function parseSheetRows(rows, defaultLabel, sheetIndex) {
+            let activeProgCode = defaultLabel;
 
+            // Step 1: Search top 5 rows for explicit program code (e.g. 010100, 040100)
+            for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                const cell = (rows[i][0] || "").trim();
+                const match = cell.match(/\b\d{6}\b/);
+                if (match) {
+                    activeProgCode = match[0];
+                    break;
+                }
+            }
+
+            if (!detectedPrograms.includes(activeProgCode)) {
+                detectedPrograms.push(activeProgCode);
+            }
+
+            // Step 2: Iterate through rows and extract transaction entries
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                if (!row || row.length === 0) continue;
+                if (!row || row.length < 5) continue;
 
                 const col0 = (row[0] || "").trim();
+                const col1 = (row[1] || "").trim();
 
-                // Detect Program Code (e.g. 010100, 040100, etc.)
-                if (/^\d{6}$/.test(col0)) {
-                    currentProgCode = col0;
-                    if (!detectedPrograms.includes(currentProgCode)) {
-                        detectedPrograms.push(currentProgCode);
-                    }
-                    continue;
-                }
-
-                // Skip Header / Metadata Rows
+                // Skip header text
                 if (col0.includes("Jenis Dokumen") || col0.includes("PENGURUSAN") || col0.includes("Bekalan") || col0.includes("Harta Modal")) {
                     continue;
                 }
 
-                const jenis = row[0] ? row[0].trim() : "";
-                const no = row[1] ? row[1].trim() : "";
-                const tarikh = row[2] ? row[2].trim() : "";
-                const perihal = row[3] ? row[3].trim() : "";
-                const kodAkaun = row[5] ? row[5].trim() : "";
-                const masuk = parseCurrency(row[6]);
-                const keluar = parseCurrency(row[7]);
-                const baki = parseCurrency(row[8]);
+                // Identify numeric values across candidate columns
+                let masuk = 0, keluar = 0, baki = 0;
+                let numerics = [];
 
-                if ((masuk > 0 || keluar > 0) && jenis !== "NaN") {
+                row.forEach((cell, idx) => {
+                    if (idx >= 5) {
+                        let val = parseCurrency(cell);
+                        if (val > 0 || (cell && cell.trim() === '0.00')) {
+                            numerics.push({ idx: idx, val: val, raw: cell });
+                        }
+                    }
+                });
+
+                // Assign numeric entries to Masuk, Keluar, Baki
+                if (numerics.length >= 3) {
+                    masuk = numerics[0].val;
+                    keluar = numerics[1].val;
+                    baki = numerics[2].val;
+                } else {
+                    masuk = parseCurrency(row[6]);
+                    keluar = parseCurrency(row[7]);
+                    baki = parseCurrency(row[8]);
+                }
+
+                const jenis = col0 || "-";
+                const no = col1 || "-";
+                const tarikh = row[2] ? row[2].trim() : "-";
+                const perihal = row[3] ? row[3].trim() : "-";
+                const kodAkaun = row[5] ? row[5].trim() : (row[4] ? row[4].trim() : "-");
+
+                // Save valid transaction row
+                if ((masuk > 0 || keluar > 0) && jenis !== "-" && !jenis.includes("ok")) {
                     allTransactions.push({
-                        prog: currentProgCode,
-                        jenis: jenis || "-",
-                        no: no || "-",
-                        tarikh: tarikh || "-",
-                        perihal: perihal || "-",
-                        kod: kodAkaun || "-",
+                        prog: activeProgCode,
+                        jenis: jenis,
+                        no: no,
+                        tarikh: tarikh,
+                        perihal: perihal,
+                        kod: kodAkaun,
                         masuk: masuk,
                         keluar: keluar,
                         baki: baki
@@ -238,7 +266,7 @@
                 </button>
             `;
 
-            detectedPrograms.sort().forEach(prog => {
+            detectedPrograms.forEach(prog => {
                 const isActive = currentTab === prog;
                 const btn = document.createElement('button');
                 btn.onclick = () => switchTab(prog);
@@ -263,7 +291,7 @@
             const data = getActiveData();
 
             if (currentTab === 'overview') {
-                document.getElementById('programCode').innerText = "SEMUA PROGRAM (7 TAB)";
+                document.getElementById('programCode').innerText = "SEMUA PROGRAM";
                 document.getElementById('programTitle').innerText = "Gambaran Keseluruhan Kewangan Jabatan";
                 document.getElementById('programSubtext').innerText = "Integrasi automatik seluruh 7 helaian program";
             } else {
@@ -282,7 +310,7 @@
             document.getElementById('kpiKeluar').innerText = `RM ${totalKeluar.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('kpiBaki').innerText = `RM ${baki.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             document.getElementById('kpiPct').innerText = `${pct}%`;
-            document.getElementById('kpiBar').style.width = `${Math.min(pct, 100)}%`;
+            document.getElementById('kpiBar').style.width = `${Math.min(parseFloat(pct), 100)}%`;
             document.getElementById('kpiTransCount').innerText = `${spentCount} Transaksi Belanja`;
 
             renderTable(data);
@@ -292,6 +320,11 @@
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400">Tiada rekod transaksi dijumpai.</td></tr>`;
+                return;
+            }
 
             data.forEach(item => {
                 const tr = document.createElement('tr');
@@ -321,7 +354,6 @@
             const ctx2 = document.getElementById('chart2').getContext('2d');
 
             if (currentTab === 'overview') {
-                // In Overview mode, Chart 1 shows Expenditure grouped by Program
                 const progGroup = {};
                 data.filter(d => d.keluar > 0).forEach(d => {
                     progGroup[d.prog] = (progGroup[d.prog] || 0) + d.keluar;
@@ -339,7 +371,6 @@
                     options: { responsive: true, maintainAspectRatio: false }
                 });
             } else {
-                // In Program mode, Chart 1 shows Expenditure grouped by Kod Akaun
                 const codeGroup = {};
                 data.filter(d => d.keluar > 0).forEach(d => {
                     codeGroup[d.kod] = (codeGroup[d.kod] || 0) + d.keluar;
@@ -358,7 +389,6 @@
                 });
             }
 
-            // Chart 2: Expenditure over time / transactions
             const spendingTx = data.filter(d => d.keluar > 0);
             chart2Instance = new Chart(ctx2, {
                 type: 'bar',
@@ -385,7 +415,6 @@
             renderTable(filtered);
         });
 
-        // Initialize dashboard fetching on load
         window.onload = fetchAllData;
     </script>
 </body>
