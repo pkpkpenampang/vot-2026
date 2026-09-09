@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse for real-time CSV parsing -->
+    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
@@ -39,6 +39,12 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+
+        <!-- Status & Diagnostic Banner -->
+        <div id="diagnosticBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-xl text-xs space-y-1">
+            <div class="font-bold flex items-center gap-1">⚠️ Status Capaian Data:</div>
+            <div id="diagnosticText">Sedang menyemak pautan Google Sheets...</div>
+        </div>
 
         <!-- Program Subheader Badge -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -128,13 +134,13 @@
 
     <script>
         const PROGRAM_SOURCES = [
-            { label: "010100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=2082925730&single=true&output=csv" },
-            { label: "040100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=347453524&single=true&output=csv" },
-            { label: "Tab 3", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1183991511&single=true&output=csv" },
-            { label: "Tab 4", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=919148410&single=true&output=csv" },
-            { label: "Tab 5", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1533984767&single=true&output=csv" },
-            { label: "Tab 6", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=936928104&single=true&output=csv" },
-            { label: "Tab 7", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=219580261&single=true&output=csv" }
+            { id: "1", label: "010100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=2082925730&single=true&output=csv" },
+            { id: "2", label: "040100", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=347453524&single=true&output=csv" },
+            { id: "3", label: "Program 3", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1183991511&single=true&output=csv" },
+            { id: "4", label: "Program 4", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=919148410&single=true&output=csv" },
+            { id: "5", label: "Program 5", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=1533984767&single=true&output=csv" },
+            { id: "6", label: "Program 6", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=936928104&single=true&output=csv" },
+            { id: "7", label: "Program 7", url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTfTJEeor0bng5n65f2lJaN8UPFarrDx_X14Nu5XblHmGxU7JFQw0cWPlhu3KHJZtkOwd9uRlWybBBw/pub?gid=219580261&single=true&output=csv" }
         ];
 
         let allTransactions = [];
@@ -143,119 +149,124 @@
         let chart1Instance = null;
         let chart2Instance = null;
 
-        function parseCurrency(str) {
-            if (!str) return 0.0;
-            let cleaned = str.toString().replace(/[^0-9.-]+/g, "");
-            let val = parseFloat(cleaned);
-            return isNaN(val) ? 0.0 : val;
+        function cleanNum(val) {
+            if (val === null || val === undefined) return 0;
+            let str = val.toString().replace(/[^0-9.-]/g, '');
+            let num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
         }
 
-        function fetchAllData() {
-            document.getElementById('lastUpdated').innerText = 'Memuatkan Data...';
+        async function fetchAllData() {
+            document.getElementById('lastUpdated').innerText = 'Memuatkan...';
+            const diagBanner = document.getElementById('diagnosticBanner');
+            const diagText = document.getElementById('diagnosticText');
+            diagBanner.classList.add('hidden');
+
             allTransactions = [];
             detectedPrograms = [];
 
-            let promises = PROGRAM_SOURCES.map((src, index) => {
-                return new Promise((resolve) => {
-                    Papa.parse(src.url, {
-                        download: true,
-                        header: false,
-                        skipEmptyLines: true,
-                        complete: function(results) {
-                            parseSheetRows(results.data, src.label, index + 1);
-                            resolve();
-                        },
-                        error: function(err) {
-                            console.error("Ralat memuat:", src.url, err);
-                            resolve();
-                        }
-                    });
-                });
+            let loadedCount = 0;
+            let errorLogs = [];
+
+            const fetchPromises = PROGRAM_SOURCES.map(async (src) => {
+                try {
+                    const response = await fetch(src.url);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const csvText = await response.text();
+                    
+                    const parsed = Papa.parse(csvText, { skipEmptyLines: true });
+                    if (parsed.data && parsed.data.length > 0) {
+                        parseSheetContent(parsed.data, src.label);
+                        loadedCount++;
+                    }
+                } catch (err) {
+                    console.error(`Ralat Helaian ${src.label}:`, err);
+                    errorLogs.push(`${src.label}: ${err.message}`);
+                }
             });
 
-            Promise.all(promises).then(() => {
-                const now = new Date();
-                document.getElementById('lastUpdated').innerText = `Live: ${now.toLocaleTimeString('ms-MY')}`;
-                renderDynamicTabs();
-                updateDashboard();
-            });
+            await Promise.allSettled(fetchPromises);
+
+            const now = new Date();
+            document.getElementById('lastUpdated').innerText = `Live: ${now.toLocaleTimeString('ms-MY')}`;
+
+            if (errorLogs.length > 0) {
+                diagBanner.classList.remove('hidden');
+                diagText.innerHTML = `Berjaya memuatkan <b>${loadedCount}</b> daripada 7 helaian. (Ralat: ${errorLogs.join(', ')})`;
+            }
+
+            renderDynamicTabs();
+            updateDashboard();
         }
 
-        function parseSheetRows(rows, defaultLabel, sheetIndex) {
-            let activeProgCode = defaultLabel;
+        function parseSheetContent(rows, fallbackLabel) {
+            let sheetProgCode = fallbackLabel;
 
-            // Step 1: Search top 5 rows for explicit program code (e.g. 010100, 040100)
-            for (let i = 0; i < Math.min(rows.length, 5); i++) {
-                const cell = (rows[i][0] || "").trim();
-                const match = cell.match(/\b\d{6}\b/);
-                if (match) {
-                    activeProgCode = match[0];
+            // Search top 5 rows for 6-digit program code
+            for (let r = 0; r < Math.min(rows.length, 5); r++) {
+                const cell = (rows[r][0] || "").trim();
+                const m = cell.match(/\b\d{6}\b/);
+                if (m) {
+                    sheetProgCode = m[0];
                     break;
                 }
             }
 
-            if (!detectedPrograms.includes(activeProgCode)) {
-                detectedPrograms.push(activeProgCode);
+            if (!detectedPrograms.includes(sheetProgCode)) {
+                detectedPrograms.push(sheetProgCode);
             }
 
-            // Step 2: Iterate through rows and extract transaction entries
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                if (!row || row.length < 5) continue;
+            // Find rows with transactions
+            rows.forEach((row) => {
+                if (!row || row.length < 4) return;
 
                 const col0 = (row[0] || "").trim();
                 const col1 = (row[1] || "").trim();
+                const col2 = (row[2] || "").trim();
+                const col3 = (row[3] || "").trim();
 
-                // Skip header text
+                // Skip header / label rows
                 if (col0.includes("Jenis Dokumen") || col0.includes("PENGURUSAN") || col0.includes("Bekalan") || col0.includes("Harta Modal")) {
-                    continue;
+                    return;
                 }
 
-                // Identify numeric values across candidate columns
+                // Check for numeric columns
                 let masuk = 0, keluar = 0, baki = 0;
-                let numerics = [];
+                let numCells = [];
 
-                row.forEach((cell, idx) => {
-                    if (idx >= 5) {
-                        let val = parseCurrency(cell);
-                        if (val > 0 || (cell && cell.trim() === '0.00')) {
-                            numerics.push({ idx: idx, val: val, raw: cell });
-                        }
+                row.forEach((c, idx) => {
+                    let val = cleanNum(c);
+                    if (c && c.toString().trim() !== "" && !isNaN(val) && idx >= 4) {
+                        numCells.push({ idx: idx, val: val });
                     }
                 });
 
-                // Assign numeric entries to Masuk, Keluar, Baki
-                if (numerics.length >= 3) {
-                    masuk = numerics[0].val;
-                    keluar = numerics[1].val;
-                    baki = numerics[2].val;
-                } else {
-                    masuk = parseCurrency(row[6]);
-                    keluar = parseCurrency(row[7]);
-                    baki = parseCurrency(row[8]);
+                if (numCells.length >= 3) {
+                    masuk = numCells[0].val;
+                    keluar = numCells[1].val;
+                    baki = numCells[2].val;
+                } else if (row.length >= 9) {
+                    masuk = cleanNum(row[6]);
+                    keluar = cleanNum(row[7]);
+                    baki = cleanNum(row[8]);
                 }
 
-                const jenis = col0 || "-";
-                const no = col1 || "-";
-                const tarikh = row[2] ? row[2].trim() : "-";
-                const perihal = row[3] ? row[3].trim() : "-";
                 const kodAkaun = row[5] ? row[5].trim() : (row[4] ? row[4].trim() : "-");
 
-                // Save valid transaction row
-                if ((masuk > 0 || keluar > 0) && jenis !== "-" && !jenis.includes("ok")) {
+                if ((masuk > 0 || keluar > 0) && !col0.includes("JUMLAH") && col0 !== "ok") {
                     allTransactions.push({
-                        prog: activeProgCode,
-                        jenis: jenis,
-                        no: no,
-                        tarikh: tarikh,
-                        perihal: perihal,
+                        prog: sheetProgCode,
+                        jenis: col0 || "RE",
+                        no: col1 || "-",
+                        tarikh: col2 || "-",
+                        perihal: col3 || "-",
                         kod: kodAkaun,
                         masuk: masuk,
                         keluar: keluar,
                         baki: baki
                     });
                 }
-            }
+            });
         }
 
         function renderDynamicTabs() {
@@ -266,7 +277,7 @@
                 </button>
             `;
 
-            detectedPrograms.forEach(prog => {
+            detectedPrograms.sort().forEach(prog => {
                 const isActive = currentTab === prog;
                 const btn = document.createElement('button');
                 btn.onclick = () => switchTab(prog);
@@ -293,7 +304,7 @@
             if (currentTab === 'overview') {
                 document.getElementById('programCode').innerText = "SEMUA PROGRAM";
                 document.getElementById('programTitle').innerText = "Gambaran Keseluruhan Kewangan Jabatan";
-                document.getElementById('programSubtext').innerText = "Integrasi automatik seluruh 7 helaian program";
+                document.getElementById('programSubtext').innerText = "Integrasi automatik seluruh helaian program";
             } else {
                 document.getElementById('programCode').innerText = `PROGRAM ${currentTab}`;
                 document.getElementById('programTitle').innerText = `Rekod Kewangan Program ${currentTab}`;
@@ -322,7 +333,7 @@
             tbody.innerHTML = '';
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400">Tiada rekod transaksi dijumpai.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400">Tiada rekod transaksi dijumpai.</td></tr>`;
                 return;
             }
 
